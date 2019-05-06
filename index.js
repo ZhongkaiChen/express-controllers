@@ -11,6 +11,7 @@ var router = function () {
             rootDirectory: '',
             rootUrl:'/',
             logRoutes: false,
+            useControllerMarkups: false, // only parse xxxController.js and add xxx as a directory
         },
         settings = null,
         expressApp = null,
@@ -37,6 +38,11 @@ var router = function () {
                 }
                 else if (path.extname(file) === '.js') {
                     //Found .js controller file so create route
+                    if(settings.useControllerMarkups){
+                        if(/Controller.js$/.test(file))
+                        createRoute(fullName);
+                    }
+                    else
                     createRoute(fullName);
                 }
             });
@@ -44,7 +50,7 @@ var router = function () {
 
         createRoute = function (fullName) {
             //Grab path to JavaScript file and use it to construct the route
-            var dirs = path.dirname(fullName).split(path.sep);
+            var dirs =  settings.useControllerMarkups? path.dirname(fullName.replace(/Controller.js$/,'/Controller.js')).split(path.sep):path.dirname(fullName).split(path.sep);
 
             //Remove routesDirectory name (ex: "./controllers") 
             //so it's not in the route path that's created
